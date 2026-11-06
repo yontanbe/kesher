@@ -81,6 +81,8 @@ select{font-family:inherit;font-size:1rem;padding:10px;border-radius:12px;border
 .mrow{display:flex;gap:8px;margin:10px 0 16px}.mrow input{flex:1;font-family:inherit;font-size:1rem;padding:12px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--ink)}
 .mrow button{background:var(--gold);color:#2a1d04;border-radius:12px;padding:0 16px;font-weight:800}
 .x{font-family:var(--sans);font-size:.6em;color:var(--muted);margin-inline-start:8px}
+.chipb{background:var(--card);border:1px solid var(--line);border-radius:999px;padding:8px 14px;font-size:.9rem;font-weight:600;margin:4px 0 0 6px}.chipb.on{background:var(--gold);color:#2a1d04;border-color:var(--gold)}
+#bsel{font-family:var(--sans)}
 </style>
 </head>
 <body>
@@ -114,7 +116,7 @@ select{font-family:inherit;font-size:1rem;padding:10px;border-radius:12px;border
   <div class="setrow"><label>ניקוד</label><div class="seg" id="nk"><button data-v="1">עם</button><button data-v="0">בלי</button></div></div>
   <div class="setrow"><label>ערכה</label><div class="seg" id="th"><button data-v="dark">לילה</button><button data-v="light">יום</button></div></div>
   <div class="setrow"><label>מסך דלוק</label><div class="seg" id="wl"><button data-v="1">כן</button><button data-v="0">לא</button></div></div>
-  <button class="cta" style="margin-top:14px" onclick="closeSheet()">סגור</button>
+  <div class="setrow" style="display:block"><label>ספרי מוסר בסדר היום</label><div id="bookOpts"></div></div><button class="cta" style="margin-top:14px" onclick="closeSheet()">סגור</button>
 </div></div>
 <div class="toast" id="toast"></div>
 <script>
@@ -185,17 +187,28 @@ Object.assign(ITEMS,{
  mani:{t:MANT.mani.t,sub:MANT.mani.sub,f:async()=>mantHTML('mani')},
  mine:{t:'המנטרות שלי',sub:'כתוב משלך',f:async()=>`<div class="note">כאן כותבים משפטים אישיים. הם נשמרים רק בטלפון שלך.</div><div class="mrow"><input id="mineIn" placeholder="משפט חדש"><button onclick="addMine()">הוסף</button></div>`+(MINE.length?MINE.map((x,i)=>`<p class="ml">${x} <button class="x" onclick="delMine(${i})">מחק</button></p>`).join(''):'')}
 });
+const BOOKS={"mesilat": ["מסילת ישרים", "פרק ליום, שלבי העבודה העצמית"], "teshuva": ["שערי תשובה", "רבנו יונה, סימן ליום"], "bitachon": ["שער הביטחון", "חובות הלבבות"], "gra": ["אגרת הגר״א", "אגרת לבניו, פרק ליום"], "yashar": ["ספר הישר", "שער ליום"], "hasidim": ["ספר חסידים", "חמישה סימנים ליום"]};
+const BD={};const PTR=JSON.parse(localStorage.getItem('kesher.ptr')||'{}');const SEL=JSON.parse(localStorage.getItem('kesher.books')||'[]');
+const savePtr=()=>{localStorage.setItem('kesher.ptr',JSON.stringify(PTR));localStorage.setItem('kesher.books',JSON.stringify(SEL))};
+async function bookData(k){if(!BD[k])BD[k]=await J('data/musar-'+k+'.json');return BD[k]}
+async function bookHTML(k){const d=await bookData(k);const i=Math.min(PTR[k]||0,d.length-1);const u=d[i];
+ let sel='<select id="bsel" onchange="jumpBook(\''+k+'\',this.value)">'+d.map((x,j)=>'<option value="'+j+'"'+(j===i?' selected':'')+'>'+(x.h||('יחידה '+(j+1)))+'</option>').join('')+'</select>';
+ return sel+`<div class="note">${u.h} · ${i+1} מתוך ${d.length}. כשתלחץ סיימתי, תעבור ליחידה הבאה.</div>`+u.t.map(x=>`<p>${fmt(x)}</p>`).join('')}
+function jumpBook(k,v){PTR[k]=+v;savePtr();draw()}
+function toggleBook(k){const i=SEL.indexOf(k);if(i>=0)SEL.splice(i,1);else SEL.push(k);savePtr();renderBookOpts();renderHome()}
+function renderBookOpts(){const e=document.getElementById('bookOpts');if(e)e.innerHTML=Object.keys(BOOKS).map(k=>`<button class="chipb ${SEL.includes(k)?'on':''}" onclick="toggleBook('${k}')">${BOOKS[k][0]}</button>`).join('')}
+Object.keys(BOOKS).forEach(k=>{ITEMS[k]={t:BOOKS[k][0],sub:BOOKS[k][1],book:1,f:()=>bookHTML(k)}});
 const FULL=['modeh','torah','tefillin','shema','ashrei','esa','bingi','song','ten','thirteen','tehillim','ramban','halacha','daily','general','motiv','robbins','dispenza','mani'];
 const SHORTF=['tefillin','shema','ashrei','song','halacha','daily'];
 function renderHome(){const d=today();
  $('hdate').textContent=new Intl.DateTimeFormat('he-u-ca-hebrew',{day:'numeric',month:'long',year:'numeric'}).format(d);
  $('gdate').textContent=d.toLocaleDateString('he-IL',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
  const dn=DONE[dkey(d)]||[];
- $('lib').innerHTML=[...FULL,'mine','kzpick'].map(k=>k==='kzpick'?`<button class="tile" onclick="pickSiman()">עיון בקיצור שולחן ערוך<small>כל 221 הסימנים</small></button>`:`<button class="tile ${dn.includes(k)?'done':''}" onclick="openOne('${k}')">${ITEMS[k].t}<small>${k==='song'?'ליום '+(d.getDay()===6?'שבת':DAYN[d.getDay()]):ITEMS[k].sub}</small></button>`).join('');
+ $('lib').innerHTML=[...FULL,...Object.keys(BOOKS),'mine','kzpick'].map(k=>k==='kzpick'?`<button class="tile" onclick="pickSiman()">עיון בקיצור שולחן ערוך<small>כל 221 הסימנים</small></button>`:`<button class="tile ${dn.includes(k)?'done':''}" onclick="openOne('${k}')">${ITEMS[k].t}<small>${k==='song'?'ליום '+(d.getDay()===6?'שבת':DAYN[d.getDay()]):ITEMS[k].sub}</small></button>`).join('');
  const keys=Object.keys(DONE).filter(k=>DONE[k].length);$('sDays').textContent=keys.length;
  let n=0;const dd=new Date(d);if(!DONE[dkey(dd)]?.length)dd.setDate(dd.getDate()-1);while(DONE[dkey(dd)]?.length){n++;dd.setDate(dd.getDate()-1)}$('sStreak').textContent=n;
  $('startBtn').textContent=S.mode==='short'?'התחל את הסדר המקוצר':'התחל את הסדר המלא'}
-async function startFlow(){flow=(S.mode==='short'?SHORTF:FULL).slice();cur=0;await open()}
+async function startFlow(){flow=(S.mode==='short'?SHORTF:FULL).slice().concat(SEL);cur=0;await open()}
 async function openOne(k){flow=[k];cur=0;await open()}
 async function open(){show('reader');wakeSet();await load();draw()}
 async function draw(){const k=flow[cur],it=ITEMS[k];
@@ -205,7 +218,7 @@ async function draw(){const k=flow[cur],it=ITEMS[k];
  try{$('rBody').innerHTML=`<div class="text fade">${await it.f()}</div>`}catch(e){$('rBody').innerHTML='<div class="loading">לא הצלחתי לטעון. בדוק חיבור ונסה שוב.</div>'}
  $('prevBtn').style.visibility=cur===0?'hidden':'visible';
  $('nextBtn').textContent=cur===flow.length-1?'סיימתי':'הבא';scrollTo(0,0)}
-function mark(k){const d=dkey(today());DONE[d]=DONE[d]||[];if(!DONE[d].includes(k))DONE[d].push(k);save()}
+function mark(k){if(ITEMS[k]&&ITEMS[k].book&&BD[k]){PTR[k]=((PTR[k]||0)+1)%BD[k].length;savePtr()}const d=dkey(today());DONE[d]=DONE[d]||[];if(!DONE[d].includes(k))DONE[d].push(k);save()}
 function go(n){if(n>0){mark(flow[cur]);if(cur===flow.length-1){toast('כל הכבוד');show('home');renderHome();wakeSet();return}}cur=Math.max(0,Math.min(flow.length-1,cur+n));draw()}
 async function pickSiman(){await load();const sel=document.createElement('select');for(let i=1;i<=221;i++){const o=document.createElement('option');o.value=i;o.textContent='סימן '+i;if(i===kzNum(today()))o.selected=true;sel.appendChild(o)}
  show('reader');$('rTitle').innerHTML='קיצור שולחן ערוך<small>בחר סימן</small>';$('bar').style.width='0';$('nav').style.display='none';
@@ -213,8 +226,8 @@ async function pickSiman(){await load();const sel=document.createElement('select
  const show1=async()=>{out.innerHTML='<div class="loading">טוען</div>';const k=await kz(+sel.value);out.innerHTML=`<div class="note">${k.he}</div>`+paras(k.t)};
  sel.onchange=show1;show1();
  const back=document.querySelector('#reader .iconbtn');back.onclick=()=>{$('nav').style.display='flex';show('home');renderHome();back.onclick=()=>{show('home');renderHome()}}}
-async function saveOffline(){const b=$('dlBtn');b.textContent='שומר...';try{const c=await caches.open('kesher-data');const u=['data/siddur.json','data/psalms.json',...[0,1,2,3,4,5,6,7].map(i=>'data/kitzur-'+i+'.json')];await c.addAll(u);b.textContent='הכל שמור במכשיר ✓';toast('זמין אופליין')}catch(e){b.textContent='נכשל, נסה שוב'}}
-(function(){apply();renderHome();if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js')})();
+async function saveOffline(){const b=$('dlBtn');b.textContent='שומר...';try{const c=await caches.open('kesher-data');const u=[...Object.keys(BOOKS).map(k=>'data/musar-'+k+'.json'),'data/siddur.json','data/psalms.json',...[0,1,2,3,4,5,6,7].map(i=>'data/kitzur-'+i+'.json')];await c.addAll(u);b.textContent='הכל שמור במכשיר ✓';toast('זמין אופליין')}catch(e){b.textContent='נכשל, נסה שוב'}}
+(function(){apply();renderBookOpts();renderHome();if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js')})();
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')wakeSet()});
 </script>
 </body>

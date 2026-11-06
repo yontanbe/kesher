@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0d1424">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="קשר">
+<title>קשר · הסידור שלי</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="img/icon-192.png">
+<link rel="apple-touch-icon" href="img/icon-192.png">
+<link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@400;500;700;900&family=Heebo:wght@300;400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0d1424;--bg2:#162038;--card:#1a2742;--ink:#f1e9d4;--muted:#9aa5bf;--line:rgba(255,255,255,.1);--gold:#d9b45a;--gold2:#f0d28a;--blue:#5b8def;--serif:'Frank Ruhl Libre','David',serif;--sans:'Heebo',system-ui,sans-serif;--fs:1.5rem;--lh:2}
+[data-theme=light]{--bg:#f6f0e1;--bg2:#ece3cc;--card:#fffdf6;--ink:#1d1a12;--muted:#6f6a5b;--line:rgba(60,40,10,.14);--gold:#a8791c;--gold2:#c9972e}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans)}
+button{font-family:inherit;cursor:pointer;border:0;color:inherit;background:none}
+.screen{display:none;min-height:100vh}.screen.active{display:block}
+.hero{position:relative;height:56vh;min-height:400px;overflow:hidden}
+.hero img{width:100%;height:100%;object-fit:cover;object-position:center 18%;display:block}
+.hero:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.2),rgba(0,0,0,0) 35%,var(--bg) 100%)}
+.titles{position:absolute;right:0;left:0;bottom:12px;text-align:center;z-index:2;padding:0 20px}
+.kicker{letter-spacing:.35em;font-size:.75rem;color:var(--gold);font-weight:700}
+h1.big{font-family:var(--serif);font-weight:900;font-size:3.6rem;margin:2px 0 0;color:var(--gold2);text-shadow:0 4px 24px rgba(0,0,0,.5)}
+.sub{color:var(--muted);margin-top:4px}
+.wrap{max-width:600px;margin:0 auto;padding:8px 18px 60px}
+.datecard{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:16px 18px;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+.datecard .hd{font-family:var(--serif);font-size:1.7rem;font-weight:700;color:var(--gold2)}
+.datecard .gd{color:var(--muted);font-size:.95rem;margin-top:2px}
+.modes{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:16px 0 8px}
+.mode{background:var(--card);border:2px solid var(--line);border-radius:18px;padding:14px;text-align:right}
+.mode.on{border-color:var(--gold)}
+.mode b{display:block;font-size:1.15rem;font-family:var(--serif)}
+.mode span{font-size:.82rem;color:var(--muted);display:block;margin-top:4px;line-height:1.5}
+.cta{display:block;width:100%;background:linear-gradient(135deg,var(--gold),var(--gold2));color:#2a1d04;font-weight:800;font-size:1.2rem;padding:16px;border-radius:18px;box-shadow:0 10px 30px rgba(217,180,90,.25);margin:12px 0}
+.cta.sec{background:var(--card);color:var(--ink);border:1px solid var(--line);box-shadow:none;font-size:1.02rem;padding:13px;font-weight:600}
+h3.h{font-family:var(--serif);color:var(--gold);margin:22px 0 8px;font-size:1.25rem}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.tile{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px 12px;text-align:right;font-weight:700;font-family:var(--serif);font-size:1.05rem;position:relative}
+.tile small{display:block;font-family:var(--sans);font-weight:400;color:var(--muted);font-size:.75rem;margin-top:3px}
+.tile.done:after{content:"✓";position:absolute;left:10px;top:8px;color:var(--gold)}
+.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin:14px 0}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px;text-align:center}
+.stat b{display:block;font-family:var(--serif);font-size:1.7rem;color:var(--gold2)}
+.stat span{font-size:.78rem;color:var(--muted)}
+.credit{font-size:.74rem;color:var(--muted);text-align:center;margin-top:28px;line-height:1.6}
+.topbar{position:sticky;top:0;z-index:10;background:color-mix(in srgb,var(--bg) 90%,transparent);backdrop-filter:blur(14px);padding:10px 14px;border-bottom:1px solid var(--line)}
+.row{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.iconbtn{background:var(--card);border:1px solid var(--line);border-radius:12px;width:42px;height:42px;font-size:1.05rem;display:grid;place-items:center;flex-shrink:0}
+.ttl{font-family:var(--serif);font-weight:700;font-size:1.15rem;text-align:center;flex:1;color:var(--gold2);line-height:1.2}
+.ttl small{display:block;font-family:var(--sans);font-weight:400;color:var(--muted);font-size:.78rem}
+.bar{height:3px;background:var(--line);margin-top:8px;border-radius:2px;overflow:hidden}.bar i{display:block;height:100%;background:var(--gold);width:0;transition:width .3s}
+.reader{max-width:680px;margin:0 auto;padding:16px 18px 130px}
+.text{font-family:var(--serif);font-size:var(--fs);line-height:var(--lh);text-align:justify;text-align-last:right}
+.text p{margin:0 0 .8em}
+.text b{color:var(--gold2);font-weight:700}
+.text small{font-family:var(--sans);font-size:.5em;color:var(--muted);line-height:1.5;font-weight:400}
+.text .v{font-family:var(--sans);font-size:.5em;color:var(--gold);vertical-align:super;margin-inline-end:4px}
+.note{font-family:var(--sans);font-size:.88rem;color:var(--muted);background:var(--bg2);border-radius:12px;padding:8px 12px;margin:8px 0;line-height:1.6}
+.nav{position:fixed;bottom:0;left:0;right:0;z-index:10;padding:12px 16px calc(12px + env(safe-area-inset-bottom));background:linear-gradient(0deg,var(--bg) 65%,transparent);display:flex;gap:10px;max-width:680px;margin:0 auto}
+.nav button{flex:1;padding:14px;border-radius:16px;font-size:1.05rem;font-weight:700;background:var(--card);border:1px solid var(--line)}
+.nav button.primary{background:linear-gradient(135deg,var(--gold),var(--gold2));color:#2a1d04;flex:2;border:0}
+.loading{text-align:center;color:var(--muted);padding:60px 20px}
+.sheet{position:fixed;inset:0;z-index:50;display:none;background:rgba(0,0,0,.55)}.sheet.open{display:block}
+.panel{position:absolute;bottom:0;left:0;right:0;background:var(--bg);border-radius:24px 24px 0 0;padding:18px 20px calc(24px + env(safe-area-inset-bottom));max-height:88vh;overflow:auto}
+.panel h3{margin:0 0 10px;font-family:var(--serif);color:var(--gold2)}
+.setrow{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}
+input[type=range]{width:150px;accent-color:var(--gold)}
+.seg{display:flex;background:var(--bg2);border-radius:12px;padding:4px;gap:4px}
+.seg button{color:var(--muted);padding:8px 14px;border-radius:9px;font-weight:600}.seg button.on{background:var(--card);color:var(--ink)}
+select{font-family:inherit;font-size:1rem;padding:10px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--ink);width:100%;margin:6px 0 12px}
+.toast{position:fixed;left:50%;bottom:110px;transform:translateX(-50%);background:var(--gold);color:#2a1d04;padding:12px 18px;border-radius:999px;font-weight:800;z-index:60;display:none}
+.fade{animation:f .3s}@keyframes f{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+<section class="screen active" id="home">
+  <div class="hero"><img src="img/hero.jpg" alt="">
+    <div class="titles"><div class="kicker">הסידור שלי</div><h1 class="big">קשר</h1><div class="sub">תפילין · קריאת שמע · שיר של יום · הלכה יומית</div></div></div>
+  <div class="wrap">
+    <div class="datecard"><div class="hd" id="hdate"></div><div class="gd" id="gdate"></div></div>
+    <div class="modes">
+      <button class="mode" id="mShort" onclick="setMode('short')"><b>מקוצר</b><span>תפילין, שמע, אשרי, שיר של יום והלכה</span></button>
+      <button class="mode" id="mFull" onclick="setMode('full')"><b>מלא</b><span>כל הסדר של הבוקר, תהילים ואיגרת הרמב"ן</span></button>
+    </div>
+    <button class="cta" id="startBtn" onclick="startFlow()">התחל את הבוקר</button>
+    <div class="stats"><div class="stat"><b id="sDays">0</b><span>ימים שסיימת</span></div><div class="stat"><b id="sStreak">0</b><span>ימים ברצף</span></div></div>
+    <h3 class="h">הכל במקום אחד</h3>
+    <div class="grid" id="lib"></div>
+    <button class="cta sec" style="margin-top:16px" onclick="openSheet()">הגדרות תצוגה</button>
+    <button class="cta sec" onclick="saveOffline()" id="dlBtn">שמור הכל לאופליין</button>
+    <div class="credit">נוסח עדות המזרח, סידור ספריא. הלכה יומית מקיצור שולחן ערוך. תהילים ואיגרת הרמב"ן מספריא. עיצוב ודמות: Gemini.</div>
+  </div>
+</section>
+<section class="screen" id="reader">
+  <div class="topbar"><div class="row"><button class="iconbtn" onclick="show('home');renderHome()">✕</button><div class="ttl" id="rTitle"></div><button class="iconbtn" onclick="openSheet()">Aא</button></div><div class="bar"><i id="bar"></i></div></div>
+  <div class="reader" id="rBody"></div>
+  <div class="nav" id="nav"><button id="prevBtn" onclick="go(-1)">הקודם</button><button class="primary" id="nextBtn" onclick="go(1)">הבא</button></div>
+</section>
+<div class="sheet" id="sheet" onclick="if(event.target===this)closeSheet()"><div class="panel">
+  <h3>תצוגה</h3>
+  <div class="setrow"><label>גודל אותיות</label><input type="range" min="1" max="2.6" step="0.05" id="fsR"></div>
+  <div class="setrow"><label>ריווח</label><input type="range" min="1.4" max="2.8" step="0.05" id="lhR"></div>
+  <div class="setrow"><label>ניקוד</label><div class="seg" id="nk"><button data-v="1">עם</button><button data-v="0">בלי</button></div></div>
+  <div class="setrow"><label>ערכה</label><div class="seg" id="th"><button data-v="dark">לילה</button><button data-v="light">יום</button></div></div>
+  <div class="setrow"><label>מסך דלוק</label><div class="seg" id="wl"><button data-v="1">כן</button><button data-v="0">לא</button></div></div>
+  <button class="cta" style="margin-top:14px" onclick="closeSheet()">סגור</button>
+</div></div>
+<div class="toast" id="toast"></div>
+<script>
+const DAYN=['ראשון','שני','שלישי','רביעי','חמישי','ששי'];
+const S=JSON.parse(localStorage.getItem('kesher.s')||'{}');
+const D0={fs:1.5,lh:2,nikud:1,theme:'dark',mode:'short',wl:1};for(const k in D0)if(S[k]===undefined)S[k]=D0[k];
+const DONE=JSON.parse(localStorage.getItem('kesher.done')||'{}');
+let SID=null,PS=null,KZ={},flow=[],cur=0,wake=null;
+const NK=/[֑-ׇ]/g;
+const fmt=s=>S.nikud?s:s.replace(NK,'');
+const save=()=>{localStorage.setItem('kesher.s',JSON.stringify(S));localStorage.setItem('kesher.done',JSON.stringify(DONE))};
+const $=id=>document.getElementById(id);
+function toast(t){const e=$('toast');e.textContent=t;e.style.display='block';setTimeout(()=>e.style.display='none',2200)}
+function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));$(id).classList.add('active');scrollTo(0,0)}
+const openSheet=()=>$('sheet').classList.add('open'),closeSheet=()=>$('sheet').classList.remove('open');
+function seg(id,v){document.querySelectorAll('#'+id+' button').forEach(b=>b.classList.toggle('on',b.dataset.v===String(v)))}
+function apply(){const r=document.documentElement;r.style.setProperty('--fs',S.fs+'rem');r.style.setProperty('--lh',S.lh);r.setAttribute('data-theme',S.theme);
+ document.querySelector('meta[name=theme-color]').content=S.theme==='dark'?'#0d1424':'#f6f0e1';
+ $('fsR').value=S.fs;$('lhR').value=S.lh;seg('nk',S.nikud);seg('th',S.theme);seg('wl',S.wl);
+ $('mShort').classList.toggle('on',S.mode==='short');$('mFull').classList.toggle('on',S.mode==='full')}
+[['nk','nikud'],['th','theme'],['wl','wl']].forEach(([id,k])=>$(id).addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;S[k]=k==='theme'?b.dataset.v:Number(b.dataset.v);save();apply();if($('reader').classList.contains('active'))draw();if(k==='wl')wakeSet()}));
+$('fsR').oninput=e=>{S.fs=+e.target.value;save();apply()};$('lhR').oninput=e=>{S.lh=+e.target.value;save();apply()};
+function setMode(m){S.mode=m;save();apply();renderHome()}
+async function wakeSet(){try{if(S.wl&&'wakeLock' in navigator&&$('reader').classList.contains('active'))wake=await navigator.wakeLock.request('screen');else if(wake){wake.release();wake=null}}catch(e){}}
+const dkey=d=>{const z=new Date(d.getTime()-d.getTimezoneOffset()*6e4);return z.toISOString().slice(0,10)};
+const hebDay=d=>+new Intl.DateTimeFormat('en-u-ca-hebrew',{day:'numeric'}).format(d);
+function psalmRange(d){const n=hebDay(d);let end=false;if(n===29){const t=new Date(d);t.setDate(t.getDate()+1);end=hebDay(t)===1}
+ const M={1:[1,9],2:[10,17],3:[18,22],4:[23,28],5:[29,34],6:[35,38],7:[39,43],8:[44,48],9:[49,54],10:[55,59],11:[60,65],12:[66,68],13:[69,71],14:[72,76],15:[77,78],16:[79,82],17:[83,87],18:[88,89],19:[90,96],20:[97,103],21:[104,105],22:[106,107],23:[108,112],24:[113,118],25:[119,119,1,96],26:[119,119,97,176],27:[120,134],28:[135,139],29:[140,144],30:[145,150]};
+ let r=M[n];if(n===29&&end)r=[140,150];return r}
+const today=()=>new Date();
+async function J(u){return (await fetch(u)).json()}
+async function load(){if(!SID){SID=await J('data/siddur.json');PS=await J('data/psalms.json')}}
+async function kz(n){const c=Math.floor((n-1)/28);if(!KZ[c])KZ[c]=await J('data/kitzur-'+c+'.json');return KZ[c][String(n)]}
+const kzNum=d=>{const e=Date.UTC(2026,0,1);const t=Date.UTC(d.getFullYear(),d.getMonth(),d.getDate());return ((Math.floor((t-e)/864e5)%221)+221)%221+1}
+const paras=a=>a.map(x=>`<p>${fmt(x)}</p>`).join('');
+const psHTML=(n,extra)=>{const v=PS[n];return v.map((x,i)=>`<span class="v">${i+1}</span>${fmt(x)} `).join('')};
+const ITEMS={
+ modeh:{t:'מודה אני',sub:'השכמה',f:async()=>paras(SID.modeh)},
+ torah:{t:'ברכות התורה',sub:'השכמה',f:async()=>paras(SID.torah)},
+ tefillin:{t:'סדר הנחת תפילין',sub:'נוסח ספרד, שתי הפרשיות',f:async()=>paras(SID.tefillin)},
+ shema:{t:'קריאת שמע וברכותיה',sub:'שחרית',f:async()=>paras(SID.shema)},
+ ashrei:{t:'אשרי',sub:'יושבי ביתך',f:async()=>paras(SID.ashrei)},
+ esa:{t:'שיר המעלות',sub:'אשא עיני, תהילים קכא',f:async()=>`<p>${psHTML(121)}</p>`},
+ bingi:{t:'למנצח בנגינות',sub:'מזמור שיר, תהילים סז',f:async()=>`<p>${psHTML(67)}</p>`},
+ song:{t:'שיר של יום',sub:'',f:async()=>{const d=today().getDay();if(d===6)return `<p><b>מזמור שיר ליום השבת</b></p><p>${psHTML(92)}</p>`;return paras(SID.song[DAYN[d]])}},
+ ten:{t:'עשר זכירות',sub:'מדי יום',f:async()=>paras(SID.ten)},
+ thirteen:{t:'שלושה עשר עיקרים',sub:'אני מאמין',f:async()=>paras(SID.thirteen)},
+ tehillim:{t:'תהילים יומי',sub:'לפי יום בחודש',f:async()=>{const r=psalmRange(today());let o='';if(r.length===4){o=`<p><b>תהילים קיט</b></p><p>${PS[119].slice(r[2]-1,r[3]).map((x,i)=>`<span class="v">${r[2]+i}</span>${fmt(x)} `).join('')}</p>`}else{for(let n=r[0];n<=r[1];n++)o+=`<p><b>מזמור ${n}</b></p><p>${psHTML(n)}</p>`}return o}},
+ ramban:{t:'איגרת הרמב"ן',sub:'שמע בני מוסר אביך',f:async()=>paras(SID.ramban)},
+ halacha:{t:'הלכה יומית',sub:'קיצור שולחן ערוך',f:async()=>{const n=kzNum(today());const k=await kz(n);return `<div class="note">${k.he}</div>`+paras(k.t)}},
+};
+const FULL=['modeh','torah','tefillin','shema','ashrei','esa','bingi','song','ten','thirteen','tehillim','ramban','halacha'];
+const SHORTF=['tefillin','shema','ashrei','song','halacha'];
+function renderHome(){const d=today();
+ $('hdate').textContent=new Intl.DateTimeFormat('he-u-ca-hebrew',{day:'numeric',month:'long',year:'numeric'}).format(d);
+ $('gdate').textContent=d.toLocaleDateString('he-IL',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+ const dn=DONE[dkey(d)]||[];
+ $('lib').innerHTML=[...FULL,'kzpick'].map(k=>k==='kzpick'?`<button class="tile" onclick="pickSiman()">עיון בקיצור שולחן ערוך<small>כל 221 הסימנים</small></button>`:`<button class="tile ${dn.includes(k)?'done':''}" onclick="openOne('${k}')">${ITEMS[k].t}<small>${k==='song'?'ליום '+(d.getDay()===6?'שבת':DAYN[d.getDay()]):ITEMS[k].sub}</small></button>`).join('');
+ const keys=Object.keys(DONE).filter(k=>DONE[k].length);$('sDays').textContent=keys.length;
+ let n=0;const dd=new Date(d);if(!DONE[dkey(dd)]?.length)dd.setDate(dd.getDate()-1);while(DONE[dkey(dd)]?.length){n++;dd.setDate(dd.getDate()-1)}$('sStreak').textContent=n;
+ $('startBtn').textContent=S.mode==='short'?'התחל את הסדר המקוצר':'התחל את הסדר המלא'}
+async function startFlow(){flow=(S.mode==='short'?SHORTF:FULL).slice();cur=0;await open()}
+async function openOne(k){flow=[k];cur=0;await open()}
+async function open(){show('reader');wakeSet();await load();draw()}
+async function draw(){const k=flow[cur],it=ITEMS[k];
+ $('rTitle').innerHTML=`${it.t}<small>${flow.length>1?(cur+1)+' מתוך '+flow.length:it.sub}</small>`;
+ $('bar').style.width=((cur+1)/flow.length*100)+'%';
+ $('rBody').innerHTML='<div class="loading">טוען</div>';
+ try{$('rBody').innerHTML=`<div class="text fade">${await it.f()}</div>`}catch(e){$('rBody').innerHTML='<div class="loading">לא הצלחתי לטעון. בדוק חיבור ונסה שוב.</div>'}
+ $('prevBtn').style.visibility=cur===0?'hidden':'visible';
+ $('nextBtn').textContent=cur===flow.length-1?'סיימתי':'הבא';scrollTo(0,0)}
+function mark(k){const d=dkey(today());DONE[d]=DONE[d]||[];if(!DONE[d].includes(k))DONE[d].push(k);save()}
+function go(n){if(n>0){mark(flow[cur]);if(cur===flow.length-1){toast('כל הכבוד');show('home');renderHome();wakeSet();return}}cur=Math.max(0,Math.min(flow.length-1,cur+n));draw()}
+async function pickSiman(){await load();const sel=document.createElement('select');for(let i=1;i<=221;i++){const o=document.createElement('option');o.value=i;o.textContent='סימן '+i;if(i===kzNum(today()))o.selected=true;sel.appendChild(o)}
+ show('reader');$('rTitle').innerHTML='קיצור שולחן ערוך<small>בחר סימן</small>';$('bar').style.width='0';$('nav').style.display='none';
+ $('rBody').innerHTML='';$('rBody').appendChild(sel);const out=document.createElement('div');out.className='text';$('rBody').appendChild(out);
+ const show1=async()=>{out.innerHTML='<div class="loading">טוען</div>';const k=await kz(+sel.value);out.innerHTML=`<div class="note">${k.he}</div>`+paras(k.t)};
+ sel.onchange=show1;show1();
+ const back=document.querySelector('#reader .iconbtn');back.onclick=()=>{$('nav').style.display='flex';show('home');renderHome();back.onclick=()=>{show('home');renderHome()}}}
+async function saveOffline(){const b=$('dlBtn');b.textContent='שומר...';try{const c=await caches.open('kesher-data');const u=['data/siddur.json','data/psalms.json',...[0,1,2,3,4,5,6,7].map(i=>'data/kitzur-'+i+'.json')];await c.addAll(u);b.textContent='הכל שמור במכשיר ✓';toast('זמין אופליין')}catch(e){b.textContent='נכשל, נסה שוב'}}
+(function(){apply();renderHome();if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js')})();
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')wakeSet()});
+</script>
+</body>
+</html>
